@@ -1,0 +1,15 @@
+# 第4章 iOS プッシュ通知の基本的な実装方法
+
+この章では、iOSアプリでプッシュ通知を受け取るために必要なdevice token(デバイストークン)を取得する手順について説明していきます。
+
+## 4.1 device token(デバイストークン)とは？
+
+次の章で詳しく説明しますが、プッシュ通知を発行する際に、その発行先をdevice tokenで指定します。device tokenは、端末・アプリごとに1意となっていて、1つの有効なdevice tokenへ発行した通知はただ1つの端末の特定の1つのアプリにのみ届くようになっています。また、そのアプリがアンインストールされた際などにそのdevice tokenは無効となり、そのdevice tokenへ向けてプッシュ通知を発行しても失敗し不達となります。
+
+この章ではこのdevice tokenを取得する方法に絞って説明していきます。iOSアプリでのプッシュ通知周りの実装は多岐に渡りますが、それらは後の章で扱います。
+
+## 3.4 Xcode での対応
+
+_これから説明するXcodeプロジェクトのサンプルは、サンプルコードの`NotificationExample.xcodeproj`プロジェクトの`Simple`ターゲットに含まれています。_
+
+それでは、[iOS Certificates - Apple Developer](https://developer.apple.com/account/ios/certificate)で作成した各種ファイルを用いて

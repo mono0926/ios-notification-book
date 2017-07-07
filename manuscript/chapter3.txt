@@ -1,18 +1,12 @@
-# 第3章 iOS プッシュ通知の基本的な実装方法
+# 第3章 [iOS Certificates - Apple Developer](https://developer.apple.com/account/ios/certificate)での作業
 
-この章では、iOSアプリでプッシュ通知を受け取るために必要なdevice token(デバイストークン)を取得する手順について説明していきます。
-
-3.1 device token(デバイストークン)とは？
-
-次の章で詳しく説明しますが、プッシュ通知を発行する際に、その発行先をdevice tokenで指定します。device tokenは、端末・アプリごとに1意となっていて、1つの有効なdevice tokenへ発行した通知はただ1つの端末の特定の1つのアプリにのみ届くようになっています。また、そのアプリがアンインストールされた際などにそのdevice tokenは無効となり、そのdevice tokenへ向けてプッシュ通知を発行しても失敗し不達となります。
-
-この章ではこのdevice tokenを取得する方法に絞って説明していきます。iOSアプリでのプッシュ通知周りの実装は多岐に渡りますが、それらは後の章で扱います。
+この章では、プッシュ通知をするにあたり前もって[iOS Certificates - Apple Developer](https://developer.apple.com/account/ios/certificate)にて必要な作業を説明していきます。
 
 ## 3.1 プッシュ通知の2つの方式
 
+TODO: 証明書ベースとHTTP/2の説明で後者のみ
 
-
-## 3.2 [iOS Certificates - Apple Developer](https://developer.apple.com/account/ios/certificate)での作業
+## 3.2 [iOS Certificates - Apple Developer](https://developer.apple.com/account/ios/certificate)での作業手順
 
 device tokenの取得には[Apple Developer Program](https://developer.apple.com/programs/jp/)への登録が必要です。個人の場合は、2017年7月7日時点で年間11,800円です。詳しくは公式サイトの説明などご覧ください。本書では具体的な登録手順は割愛し、開発者登録済みの前提で説明していきます。
 
@@ -22,7 +16,13 @@ device tokenの取得には[Apple Developer Program](https://developer.apple.com
 
 ![](images/chapter3/account.png)
 
+### 証明書を作成
+
+TODO
+
 ### プッシュ通知発行に必要なKeyファイルを生成・ダウンロード
+
+次の手順通りに操作して、プッシュ通知発行に必要なKeyファイルを生成・ダウンロードしておきます。
 
 1. Keys -  Allを選択
 2. +ボタンを押す
@@ -37,5 +37,93 @@ device tokenの取得には[Apple Developer Program](https://developer.apple.com
   - 記載の説明の通り、ダウンロードは1回しかできないので、ダウンロードしたKeyファイルは速やかに所望の安全な場所に保存
 
 ![](images/chapter3/certificate.png)
+
 ![](images/chapter3/new_key1.png)
+
 ![](images/chapter3/new_key2.png)
+
+### App IDを生成
+
+単に実機実行したいだけであれば、[Xcode 7以降は無料で行えるようになりました](http://qiita.com/FumihikoSHIROYAMA/items/a754f77c41b585c90329)。ただ、プッシュ通知を使う場合は、開発者登録して、明示的なApp ID(Wildcaseでは無いApp ID)を生成する必要があります。このApp IDでアプリが一意に区別されます。
+
+App IDの生成は以下の手順で行います。すでにApp IDが生成済みであればスキップしてください。
+
+1. Identifiers - App IDsを選択
+2. +ボタンを押す
+3. App ID DescriptionのNameを記入
+  - 区別できれば何でも良い
+4. Explicit App ID(明示的なApp ID)を記入
+  - 世界で一意である必要がある
+  - `YOUR_DOMAIN.アプリ名`が推奨
+5. Confirm → Registerと押して生成
+
+![](images/chapter3/app_id1.png)
+
+![](images/chapter3/app_id2.png)
+
+### 端末のUDIDの登録
+
+明示的なApp ID指定をしたアプリを実機実行するには、端末のUDID登録が必要です。すでに登録済みであればスキップしてください。
+
+まずは端末のUDIDを[iPhoneなどのUDIDを調べる方法 | MUSHIKAGO APPS MEMO](http://mushikago.com/i/?p=1833)などを参考に調べておきます。
+
+次に、以下の手順で登録します。
+
+1. Devices - Allを選択
+2. +ボタンを押す
+3. 端末のNameを入力
+  - 区別できれば何でも良い
+4. 調べておいたUDIDを入力
+
+![](images/chapter3/device1.png)
+
+![](images/chapter3/device2.png)
+
+詳しくは割愛しますが、端末登録は[fastlane/register_devices](https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/register_devices.rb)という[fastlane](https://fastlane.tools)のアクションを用いることで、コマンドで済ませることもできます。
+
+
+#### アクションの実行例
+
+```ruby
+register_devices(devices_file: "devices.txt")
+```
+
+#### デバイス一覧ファイルの例
+
+```txt
+Device ID	Device Name
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx	Masayuki Ono - iPhone 7 Plus
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx	Masayuki Ono - iPhone 7 Plus2
+```
+
+### Provisioning Profileの作成
+
+最後に、次の手順で、上で作成した証明書・App ID・端末を紐付けるProvisioning Profileを作成します。
+
+1. Provisioning Profiles - Allを選択
+2. +ボタンを押す
+3. 作りたいProvisioning Profileの種類を選択(基本的には、まずはデバッグ実行用)
+    - デバッグ実行用: Development - iOS App Development
+    - AdHoc配布用: Distribution - Ad Hoc
+    - AppStore用: Distribution - App Store 
+4. 紐付けるApp IDで先ほど作ったApp IDを選択
+5. 紐付ける証明書を選択
+6. 紐付ける端末を選択
+    - App Storeの時はこの項目は無し
+7. Provisioning Profile名を入力
+  - 区別できれば何でも良い
+
+
+![](images/chapter3/pp1.png)
+
+![](images/chapter3/pp2.png)
+
+![](images/chapter3/pp3.png)
+
+![](images/chapter3/pp4.png)
+
+![](images/chapter3/pp5.png)
+
+![](images/chapter3/pp6.png)
+
+作業は以上となります。初めてだと色々やるべきことが多く感じますが、慣れた2回目以降はサクッとできるようになると思います。
