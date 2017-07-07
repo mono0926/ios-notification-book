@@ -1,2 +1,41 @@
-# Chapter 3
-Hello, world!
+# 第3章 iOS プッシュ通知の基本的な実装方法
+
+この章では、iOSアプリでプッシュ通知を受け取るために必要なdevice token(デバイストークン)を取得する手順について説明していきます。
+
+3.1 device token(デバイストークン)とは？
+
+次の章で詳しく説明しますが、プッシュ通知を発行する際に、その発行先をdevice tokenで指定します。device tokenは、端末・アプリごとに1意となっていて、1つの有効なdevice tokenへ発行した通知はただ1つの端末の特定の1つのアプリにのみ届くようになっています。また、そのアプリがアンインストールされた際などにそのdevice tokenは無効となり、そのdevice tokenへ向けてプッシュ通知を発行しても失敗し不達となります。
+
+この章ではこのdevice tokenを取得する方法に絞って説明していきます。iOSアプリでのプッシュ通知周りの実装は多岐に渡りますが、それらは後の章で扱います。
+
+## 3.1 プッシュ通知の2つの方式
+
+
+
+## 3.2 [iOS Certificates - Apple Developer](https://developer.apple.com/account/ios/certificate)での作業
+
+device tokenの取得には[Apple Developer Program](https://developer.apple.com/programs/jp/)への登録が必要です。個人の場合は、2017年7月7日時点で年間11,800円です。詳しくは公式サイトの説明などご覧ください。本書では具体的な登録手順は割愛し、開発者登録済みの前提で説明していきます。
+
+### [iOS Certificates - Apple Developer](https://developer.apple.com/account/ios/certificate)にアクセス
+
+[Apple Developer Account](https://developer.apple.com/account/)サイトトップに、`Certificates, IDs & Profiles`へのリンクがあるのでそこから[iOS Certificates - Apple Developer](https://developer.apple.com/account/ios/certificate)にアクセスできます。
+
+![](images/chapter3/account.png)
+
+### プッシュ通知発行に必要なKeyファイルを生成・ダウンロード
+
+1. Keys -  Allを選択
+2. +ボタンを押す
+3. Key名を入力
+  - 区別できれば何でも良い
+4. APNsのチェックをつける
+  - [DeviceCheck](https://developer.apple.com/documentation/devicecheck)のチェックはどちらでも良い
+5. Confirmを押す
+6. Key IDを確認
+  - この後、いつでも確認可能
+7. Downloadボタンを押して`AuthKey_KEYID.p8`というKeyファイルをダウンロード
+  - 記載の説明の通り、ダウンロードは1回しかできないので、ダウンロードしたKeyファイルは速やかに所望の安全な場所に保存
+
+![](images/chapter3/certificate.png)
+![](images/chapter3/new_key1.png)
+![](images/chapter3/new_key2.png)
