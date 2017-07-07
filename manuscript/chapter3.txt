@@ -126,4 +126,10 @@ xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx	Masayuki Ono - iPhone 7 Plus2
 
 ![](images/chapter3/pp6.png)
 
+作成したProvisioning Profileはダウンロードして開くとKeychainに読み込まれます。
+
+また、XcodeのPreferenceのAccountsタブの`Download All Profiles`ボタンで一気に作成済みのProvisioning Profileのダウンロード・更新ができて便利なので、筆者は主にそちらを用いてローカルのProvisioning Profileの更新を行なっています。
+
+![](images/chapter3/profile.png)
+
 作業は以上となります。初めてだと色々やるべきことが多く感じますが、慣れた2回目以降はサクッとできるようになると思います。
