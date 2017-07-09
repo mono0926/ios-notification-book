@@ -20,7 +20,7 @@ _これから説明するXcodeプロジェクトのサンプルは、サンプ�
 
 まずは、プロジェクトを作成します。形式は何でも良いですが、とりあえず一番シンプルな`Single View App`をオススメします。
 
-![](images/chapter4/new_app1.png)
+![TODO: コード](images/chapter4/new_app1.png)
 
 次に、適当なProduct Name(アプリ名)・Teamを指定して新規アプリを作ります。
 
@@ -49,6 +49,7 @@ _これから説明するXcodeプロジェクトのサンプルは、サンプ�
 
 まず、`AppDelegate.swift`を開きます。そして、[UserNotifications](https://developer.apple.com/documentation/usernotifications)フレームワークをimportします。これは、iOS 10で新しくできた通知用のフレームワークで、それまでUIKitに包含されていた通知周りが切り出され、以前と比べて大変使いやすくなっています。
 
+{caption: "ファイルの冒頭でUserNotificationsをimport"}
 ```swift
 import UserNotifications
 ```
