@@ -181,3 +181,7 @@ xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx	Masayuki Ono - iPhone 7 Plus2
 Binary Provider API | HTTP/2方式
 --- | ---
 ![](images/chapter3/legacy.png) | ![](images/chapter3/http2.png)
+
+A> ## おまけ
+A>
+A> コラム的な何か
