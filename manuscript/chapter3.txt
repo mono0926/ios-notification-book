@@ -178,6 +178,7 @@ xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx	Masayuki Ono - iPhone 7 Plus2
 - リクエスト数が制限されていないか
 - ペイロードサイズが大きすぎないか
 
+{title="TODO"}
 | Binary Provider API | HTTP/2方式 |
 | --- | --- |
 | ![](images/chapter3/legacy.png) | ![](images/chapter3/http2.png) |
