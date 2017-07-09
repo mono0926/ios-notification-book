@@ -59,8 +59,7 @@ import UserNotifications
 - 通知許可を求める
 - 通知が許可された場合にdevice tokenをリクエスト
 
-{format: swift}
-![codes/chapter4/AppDelegate1.swift](code)
+<<[TODO: code](codes/chapter4/AppDelegate1.swift)
 
 それでは、上記コードを解説していきます。
 
@@ -94,8 +93,7 @@ import UserNotifications
 `registerForRemoteNotifications()`でdevice tokenの取得リクエストが走り、その結果が`AppDelegate`クラスの次のいずれかのメソッドに返ります。前者は失敗時後者は成功時に呼ばれます。
 
 
-{format: swift}
-![codes/chapter4/AppDelegate2.swift](code)
+![TODO: code2](codes/chapter4/AppDelegate2.swift)
 
 #### 失敗時のハンドリング
 
