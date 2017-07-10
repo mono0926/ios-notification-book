@@ -92,6 +92,7 @@ import UserNotifications
 `registerForRemoteNotifications()`でdevice tokenの取得リクエストが走り、その結果が`AppDelegate`クラスの次のいずれかのメソッドに返ります。前者は失敗時後者は成功時に呼ばれます。
 
 
+<<[TODO: code2](codes/chapter4/AppDelegate2.swift)
 
 #### 失敗時のハンドリング
 
