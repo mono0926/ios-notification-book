@@ -11,7 +11,7 @@ device tokenの取得には[Apple Developer Program](https://developer.apple.com
 [Apple Developer Account](https://developer.apple.com/account/)サイトトップに、`Certificates, IDs & Profiles`へのリンクがあるのでそこから[iOS Certificates - Apple Developer](https://developer.apple.com/account/ios/certificate)にアクセスできます。
 
 {cite: "TODO: cite"}
-![ertificates, IDs & Profiles](images/chapter3/account.png)
+![Certificates, IDs & Profiles](images/chapter3/account.png)
 
 では、以下このサイト上での各手順を説明していきます。すでに作成済みの項目があれば適宜スキップしてください。
 
