@@ -108,7 +108,7 @@ E> Domain=NSCocoaErrorDomain Code=3010 "remote notifications are not supported i
 
 2つ目は、CapabilitiesでPush Notificationsをオンにしていない場合です。
 
->E Domain=NSCocoaErrorDomain Code=3000 "no valid “aps-environment” entitlement string found for application" UserInfo={NSLocalizedDescription=no valid “aps-environment” entitlement string found for application}
+E> Domain=NSCocoaErrorDomain Code=3000 "no valid “aps-environment” entitlement string found for application" UserInfo={NSLocalizedDescription=no valid “aps-environment” entitlement string found for application}
 
 その他、設定ミスによっていくつかパターンがありますが、エラーログを落ち着いて確認したり調べたりして対処していきましょう。
 
