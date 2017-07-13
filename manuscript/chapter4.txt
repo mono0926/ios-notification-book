@@ -10,42 +10,42 @@
 
 
 
-## 4.2 Xcode プロジェクトの作成と設定
+## 4.2 Xcode プロジェクトの作成と設定
 
-_これから説明するXcodeプロジェクトのサンプルは、サンプルコードの`NotificationExample.xcodeproj`プロジェクトの`Simple`ターゲットに含まれています。_
+_これから説明するXcodeプロジェクトのサンプルは、サンプルコードの`NotificationExample.xcodeproj`プロジェクトの`Simple`ターゲットに含まれています。_
 
-それでは、[iOS Certificates - Apple Developer](https://developer.apple.com/account/ios/certificate)で生成した各種ファイルを用いてXcodeでの作業を進めていきます。
+それでは、[iOS Certificates - Apple Developer](https://developer.apple.com/account/ios/certificate)で生成した各種ファイルを用いてXcodeでの作業を進めていきます。
 
-### プロジェクトの作成
+### プロジェクトの作成
 
 まずは、プロジェクトを作成します。形式は何でも良いですが、とりあえず一番シンプルな`Single View App`をオススメします。
 
 ![TODO: コード](images/chapter4/new_app1.png)
 
-次に、適当なProduct Name(アプリ名)・Teamを指定して新規アプリを作ります。
+次に、適当なProduct Name(アプリ名)・Teamを指定して新規アプリを作ります。
 
 ![](images/chapter4/new_app2.png)
 
 ### プッシュ通知対応のためのプロジェクト設定
 
-まず、プロジェクト設定にて作成したアプリターゲットを選び、Generalタブにて、第3章で作成したものを次のように適用します。
+まず、プロジェクト設定にて作成したアプリターゲットを選び、Generalタブにて、第3章で作成したものを次のように適用します。
 
 - Identity - Bundle Identifier: 作成したApp ID
 - Signing - Team: 第3章の[iOS Certificates - Apple Developer](https://developer.apple.com/account/ios/certificate)上での作業で利用したTeam
 
 ![](images/chapter4/general.png)
 
-もしもどこかが間違えているとエラーが表示されるので、そのエラーメッセージを見たり第3章を再度見るなどして解決してください。
+もしもどこかが間違えているとエラーが表示されるので、そのエラーメッセージを見たり第3章を再度見るなどして解決してください。
 
-うまくいった場合は、隣のCapabilitiesタブにて、Push Notificationsという項目が現れます(逆にGeneralタブでの設定が正しくないと項目が出てこないこともあります)。デフォルトはオフなので、オンに切り替えます。
+うまくいった場合は、隣のCapabilitiesタブにて、Push Notificationsという項目が現れます(逆にGeneralタブでの設定が正しくないと項目が出てこないこともあります)。デフォルトはオフなので、オンに切り替えます。
 
 ![](images/chapter4/capabilities.png)
 
-以上で、device tokenを得るための設定は完了です。
+以上で、device tokenを得るための設定は完了です。
 
 ## 4.3 device tokenの取得
 
-それでは、device tokenを取得するための最小限のコードを書いていきます。以下、サポートバージョンはiOS 10以上となります。
+それでは、device tokenを取得するための最小限のコードを書いていきます。以下、サポートバージョンはiOS 10以上となります。
 
 まず、`AppDelegate.swift`を開きます。そして、[UserNotifications](https://developer.apple.com/documentation/usernotifications)フレームワークをimportします。これは、iOS 10で新しくできた通知用のフレームワークで、それまでUIKitに包含されていた通知周りが切り出され、以前と比べて大変使いやすくなっています。
 
@@ -54,10 +54,10 @@ _これから説明するXcodeプロジェクトのサンプルは、サンプ�
 import UserNotifications
 ```
 
-次に、`AppDelegate`クラスの[-application:didFinishLaunchingWithOptions:](https://developer.apple.com/documentation/uikit/uiapplicationdelegate/1622921-application?language=objc)という、アプリが終了した状態から起動される度に毎回初めに必ず呼ばれるメソッド内に、以下の処理を書きます。
+次に、`AppDelegate`クラスの[-application:didFinishLaunchingWithOptions:](https://developer.apple.com/documentation/uikit/uiapplicationdelegate/1622921-application?language=objc)という、アプリが終了した状態から起動される度に毎回初めに必ず呼ばれるメソッド内に、以下の処理を書きます。
 
 - 通知許可を求める
-- 通知が許可された場合にdevice tokenをリクエスト
+- 通知が許可された場合にdevice tokenをリクエスト
 
 <<[TODO: code](codes/chapter4/AppDelegate1.swift)
 
@@ -65,16 +65,16 @@ import UserNotifications
 
 ### A: 通知許可を求める
 
-[requestAuthorization(options:completionHandler:)](https://developer.apple.com/documentation/usernotifications/unusernotificationcenter/1649527-requestauthorization)というメソッドで、通知許可を求めるアラートを表示します。許可・不許可、いずれか1回選択されたら、以後そのアプリがアラートは出すことができず、変更する場合はユーザーが設定アプリでの変更操作をする必要があります。
+[requestAuthorization(options:completionHandler:)](https://developer.apple.com/documentation/usernotifications/unusernotificationcenter/1649527-requestauthorization)というメソッドで、通知許可を求めるアラートを表示します。許可・不許可、いずれか1回選択されたら、以後そのアプリがアラートは出すことができず、変更する場合はユーザーが設定アプリでの変更操作をする必要があります。
 
-そのため、本来はこのアラートはアプリ要件に応じて最適なタイミングで表示することが望ましいのですが、ドキュメントにも、[application:didFinishLaunchingWithOptions:](https://developer.apple.com/documentation/uikit/uiapplicationdelegate/1622921-application)で呼ぶのが基本で、あとで呼ぶ場合は気をつけて調整するように、と書いてあります。後のUXの章でこのあたり触れていきます。
+そのため、本来はこのアラートはアプリ要件に応じて最適なタイミングで表示することが望ましいのですが、ドキュメントにも、[application:didFinishLaunchingWithOptions:](https://developer.apple.com/documentation/uikit/uiapplicationdelegate/1622921-application)で呼ぶのが基本で、あとで呼ぶ場合は気をつけて調整するように、と書いてあります。後のUXの章でこのあたり触れていきます。
 
 > Typically, you perform all of your configuration before your application finishes launching. In iOS and tvOS, this means configuring your notification support no later than the application:didFinishLaunchingWithOptions: method of your UIApplication delegate. In watchOS, configure that support no later than the applicationDidFinishLaunching method of your WKExtension delegate. You may perform this configuration at a later time, but you must avoid scheduling any local or remote notifications targeting your app until this configuration is complete.
 > [Local and Remote Notification Programming Guide: Managing Your App’s Notification Support](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/SupportingNotificationsinYourApp.html#//apple_ref/doc/uid/TP40008194-CH4-SW1)
 
 ### B: 通知が許可された場合にdevice tokenをリクエスト
 
-通知が許可されたら、次に[registerForRemoteNotifications()](https://developer.apple.com/documentation/uikit/uiapplication/1623078-registerforremotenotifications)というメソッドを呼び、device tokenの取得をリクエストします。これはアプリを起動するごとに毎回呼ぶ必要があります。
+通知が許可されたら、次に[registerForRemoteNotifications()](https://developer.apple.com/documentation/uikit/uiapplication/1623078-registerforremotenotifications)というメソッドを呼び、device tokenの取得をリクエストします。これはアプリを起動するごとに毎回呼ぶ必要があります。
 
 一見、一回device token取得できれば、再度問い合わせる必要は無いのでは？と思ってしまいますが、公式ドキュメントにはdevice tokenは変更されるうるので起動する度に毎回問い合わせるように、と明記されています。
 
@@ -114,7 +114,7 @@ E> Domain=NSCocoaErrorDomain Code=3010 "remote notifications are not supported i
 
 #### 成功時のハンドリング
 
-ここまで記載通りに処理を記述していて、実機実行した場合、後者のメソッドが呼ばれて、Deta型のdeviceTokenが取得できます。Data型のまま取り回す場合もありますが、16進数のString型に変換して取り扱うことも多いです。また、ログに表示するときもそちらが見やすいですね。
+ここまで記載通りに処理を記述していて、実機実行した場合、後者のメソッドが呼ばれて、Deta型のdeviceTokenが取得できます。Data型のまま取り回す場合もありますが、16進数のString型に変換して取り扱うことも多いです。また、ログに表示するときもそちらが見やすいですね。
 
 残念ながら、16進数のString型に変換する標準メソッドは用意されていないですが、Swiftの場合、`deviceToken.map { String(format: "%.2hhx", $0) }.joined()`という比較的簡単な記述で変換できます。この変換方法は筆者が以前色々考えた末にベストだと思った書き方です(参考: [Swift 3.0でのプッシュ通知用のDevice TokenのData型から16進数文字列への変換方法 - Qiita](http://qiita.com/mono0926/items/3cf0dca3029f32f54a09))。
 
