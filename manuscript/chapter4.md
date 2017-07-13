@@ -2,7 +2,7 @@
 
 ## 4.1 はじめに
 
-本書はiOSアプリのプッシュ通知について説明しているが、その検証・開発のためにはプッシュ通知の発行の実装も不可欠です。本章では、HTTP/2形式でのプッシュ通知の発行のやり方をいくつか説明していきます。
+本書はiOSアプリのプッシュ通知について説明していますが、その検証・開発のためにはプッシュ通知の発行の実装も不可欠です。本章では、HTTP/2形式でのプッシュ通知の発行のやり方をいくつか説明していきます。
 
 ## 5.2 [cURL](https://curl.haxx.se)での発行
 
@@ -72,7 +72,7 @@ $ swift package generate-xcodeproj
 
 ### VaporAPNSを利用してプッシュ通知を発行
 
-`main.swift`で以下のようにVaporAPNSをimportして、プッシュ通知を送る処理を記述して、実行します。初回は[🔧 Installation · matthijs2704/vapor-apns Wiki](https://github.com/matthijs2704/vapor-apns/wiki/%F0%9F%94%A7-Installation)に記載の通り、HTTP/2対応のcurlをインストールする処理もセットで実行されます。
+`main.swift`で以下のようにVaporAPNSをimportして、プッシュ通知を送る処理を記述して、実行します。初回は[Installation · matthijs2704/vapor-apns Wiki](https://github.com/matthijs2704/vapor-apns/wiki/%F0%9F%94%A7-Installation)に記載の通り、HTTP/2対応のcurlをインストールする処理もセットで実行されます。
 
 <<[TODO: code](codes/chapter4/main.swift)
 
