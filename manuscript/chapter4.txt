@@ -28,7 +28,7 @@ _これから説明するXcodeプロジェクトのサンプルは、サンプ�
 
 ### プッシュ通知対応のためのプロジェクト設定
 
-まず、プロジェクト設定にて作成したアプリターゲットを選び、Generalタブにて、第3章で作成したものを次のように適用します。
+まず、プロジェクト設定にて作成したアプリターゲットを選び、Generalタブにて、第3章で作成したものを次のように適用します。
 
 - Identity - Bundle Identifier: 作成したApp ID
 - Signing - Team: 第3章の[iOS Certificates - Apple Developer](https://developer.apple.com/account/ios/certificate)上での作業で利用したTeam
