@@ -25,7 +25,7 @@ Hello, world!
 {title="TODO"}
 | Binary Provider API | HTTP/2方式 |
 | --- | --- |
-| ![](images/chapter3/legacy.png) | ![](images/chapter3/http2.png) |
+| ![](images/chapter2/legacy.png) | ![](images/chapter2/http2.png) |
 
 A> ## おまけ
 A>
