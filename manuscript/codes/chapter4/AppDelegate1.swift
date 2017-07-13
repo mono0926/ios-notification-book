@@ -12,7 +12,6 @@ func application(_ application: UIApplication,
         }
         // C: メインスレッドに戻す
         DispatchQueue.main.async {
-            // B: 通知がが許可された場合にdevice tokenをリクエスト
             UIApplication.shared.registerForRemoteNotifications()
         }
     }
