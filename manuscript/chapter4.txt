@@ -119,3 +119,5 @@ E> Domain=NSCocoaErrorDomain Code=3010 "remote notifications are not supported i
 残念ながら、16進数のString型に変換する標準メソッドは用意されていないですが、Swiftの場合、`deviceToken.map { String(format: "%.2hhx", $0) }.joined()`という比較的簡単な記述で変換できます。この変換方法は筆者が以前色々考えた末にベストだと思った書き方です(参考: [Swift 3.0でのプッシュ通知用のDevice TokenのData型から16進数文字列への変換方法 - Qiita](http://qiita.com/mono0926/items/3cf0dca3029f32f54a09))。
 
 `token: xxxxxxxxxxxxxxxx`のような文字列がコンソールされますが、次章ではそれを用いてプッシュ通知を発行してみます。
+
+// TODO: iOS 9非対応の言い訳
