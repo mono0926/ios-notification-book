@@ -1,123 +1,100 @@
-# 第4章 iOS プッシュ通知の基本的な実装方法
+# 第4章 プッシュ通知の発行
 
-この章では、iOSアプリでプッシュ通知を受け取るために必要なdevice token(デバイストークン)を取得する手順について説明していきます。
+## 4.1 はじめに
 
-## 4.1 device token(デバイストークン)とは？
+本書はiOSアプリのプッシュ通知について説明しているが、その検証・開発のためにはプッシュ通知の発行の実装も不可欠です。本章では、HTTP/2形式でのプッシュ通知の発行のやり方をいくつか説明していきます。
 
-プッシュ通知を発行する際に、その発行先をdevice tokenで指定します(次の章で詳しく説明します)。device tokenは、端末・アプリごとに一意となっていて、1つの有効なdevice tokenへ発行した通知はただ1つの端末の1つのアプリにのみ届くようになっています。また、そのアプリがアンインストールされた際などにそのdevice tokenは無効となり、そのdevice tokenへ向けてプッシュ通知を発行しても失敗し不達となります。
-
-この章ではこのdevice tokenを取得する方法に絞って説明していきます。iOSアプリでのプッシュ通知周りの実装は多岐に渡りますが、それらは後の章で扱います。
+## 5.2 [cURL](https://curl.haxx.se)での発行
 
 
+HTTP/2形式ということで、`curl`など使って簡単なスクリプトで送れると想像するかもしれませんが、以下のハードルがあり、ある程度手間がかかります。
 
-## 4.2 Xcode プロジェクトの作成と設定
+- HTTP/2に対応したcurlのインストール
+- 第3章で生成したプッシュ通知のKeyファイルなどを用いてJWT認証トークンの生成
+  - 期限は1時間なので再生成の必要もあり
 
-_これから説明するXcodeプロジェクトのサンプルは、サンプルコードの`NotificationExample.xcodeproj`プロジェクトの`Simple`ターゲットに含まれています。_
+以上のハードルさえ越えれば、次のようなシェルスクリプトでプッシュ通知を送ることができます。
 
-それでは、[iOS Certificates - Apple Developer](https://developer.apple.com/account/ios/certificate)で生成した各種ファイルを用いてXcodeでの作業を進めていきます。
+<<[TODO: code](codes/chapter4/publish.sh)
 
-### プロジェクトの作成
+ただ、これはiOSアプリの通知についての本としての範疇を超えてしまうと思うため、詳細は割愛して参考リンクの紹介のみにとどめておきます。
 
-まずは、プロジェクトを作成します。形式は何でも良いですが、とりあえず一番シンプルな`Single View App`をオススメします。
+- [Using cURL with HTTP/2 on Mac OS X — Simone Carletti](https://simonecarletti.com/blog/2016/01/http2-curl-macosx/)
+- [Local and Remote Notification Programming Guide: Communicating with APNs](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingwithAPNs.html)
 
-![TODO: コード](images/chapter4/new_app1.png)
 
-次に、適当なProduct Name(アプリ名)・Teamを指定して新規アプリを作ります。
+実際のアプリを作る際にも、ここを自前で全部書くのではなく、ライブラリ・サービスの利用をおすすめします。
 
-![](images/chapter4/new_app2.png)
+## 5.3 [VaporAPNS](https://github.com/matthijs2704/vapor-apns)の利用
 
-### プッシュ通知対応のためのプロジェクト設定
+ライブラリはいくつかありますが、[Swift Package Manager](https://github.com/apple/swift-package-manager)(SwiftPM)製のものでは[VaporAPNS](https://github.com/matthijs2704/vapor-apns)がおすすめなので、そちらを紹介します。
 
-まず、プロジェクト設定にて作成したアプリターゲットを選び、Generalタブにて、第3章で作成したものを次のように適用します。
+_サンプルコードは`ApnsPublisher`ディレクトリに含まれています。_
 
-- Identity - Bundle Identifier: 作成したApp ID
-- Signing - Team: 第3章の[iOS Certificates - Apple Developer](https://developer.apple.com/account/ios/certificate)上での作業で利用したTeam
+### SwiftPM実行プログラム雛形の作成
 
-![](images/chapter4/general.png)
+ApnsPublisherというパッケージ名のプッシュ通知送信プログラムを作っていきます。まずは次のように、SwiftPM実行プログラムの雛形を生成します。
 
-もしもどこかが間違えているとエラーが表示されるので、そのエラーメッセージを見たり第3章を再度見るなどして解決してください。
-
-うまくいった場合は、隣のCapabilitiesタブにて、Push Notificationsという項目が現れます(逆にGeneralタブでの設定が正しくないと項目が出てこないこともあります)。デフォルトはオフなので、オンに切り替えます。
-
-![](images/chapter4/capabilities.png)
-
-以上で、device tokenを得るための設定は完了です。
-
-## 4.3 device tokenの取得
-
-それでは、device tokenを取得するための最小限のコードを書いていきます。以下、サポートバージョンはiOS 10以上となります。
-
-まず、`AppDelegate.swift`を開きます。そして、[UserNotifications](https://developer.apple.com/documentation/usernotifications)フレームワークをimportします。これは、iOS 10で新しくできた通知用のフレームワークで、それまでUIKitに包含されていた通知周りが切り出され、以前と比べて大変使いやすくなっています。
-
-{caption: "ファイルの冒頭でUserNotificationsをimport"}
-```swift
-import UserNotifications
+```sh
+$ mkdir ApnsPublisher
+$ cd ApnsPublisher
+$ swift package init --type executable
 ```
 
-次に、`AppDelegate`クラスの[-application:didFinishLaunchingWithOptions:](https://developer.apple.com/documentation/uikit/uiapplicationdelegate/1622921-application?language=objc)という、アプリが終了した状態から起動される度に毎回初めに必ず呼ばれるメソッド内に、以下の処理を書きます。
+次のようなディレクトリ構成になるはずです。
 
-- 通知許可を求める
-- 通知が許可された場合にdevice tokenをリクエスト
+```txt
+├── Package.swift
+├── README.md
+├── Sources
+│   └── ApnsPublisher
+│       └── main.swift
+└── Tests
+```
 
-<<[TODO: code](codes/chapter4/AppDelegate1.swift)
+### VaporAPNSのインストール
 
-それでは、上記コードを解説していきます。
+`Package.swift`の`dependencies`に以下のようにVaporAPNSへの依存を指定します。
 
-### A: 通知許可を求める
+<<[TODO: code](codes/chapter4/Package.swift)
 
-[requestAuthorization(options:completionHandler:)](https://developer.apple.com/documentation/usernotifications/unusernotificationcenter/1649527-requestauthorization)というメソッドで、通知許可を求めるアラートを表示します。許可・不許可、いずれか1回選択されたら、以後そのアプリがアラートは出すことができず、変更する場合はユーザーが設定アプリでの変更操作をする必要があります。
+次のようにしてビルドすると依存解決されて、VaporAPNSを使えるようになります。VaporAPNSは多くのライブラリに依存しているため少し時間がかかります。
 
-そのため、本来はこのアラートはアプリ要件に応じて最適なタイミングで表示することが望ましいのですが、ドキュメントにも、[application:didFinishLaunchingWithOptions:](https://developer.apple.com/documentation/uikit/uiapplicationdelegate/1622921-application)で呼ぶのが基本で、あとで呼ぶ場合は気をつけて調整するように、と書いてあります。後のUXの章でこのあたり触れていきます。
+```sh
+$ swift build
+```
 
-> Typically, you perform all of your configuration before your application finishes launching. In iOS and tvOS, this means configuring your notification support no later than the application:didFinishLaunchingWithOptions: method of your UIApplication delegate. In watchOS, configure that support no later than the applicationDidFinishLaunching method of your WKExtension delegate. You may perform this configuration at a later time, but you must avoid scheduling any local or remote notifications targeting your app until this configuration is complete.
-> [Local and Remote Notification Programming Guide: Managing Your App’s Notification Support](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/SupportingNotificationsinYourApp.html#//apple_ref/doc/uid/TP40008194-CH4-SW1)
+さらに以下を実行してXcodeプロジェクトを生成して、以後のプログラム記述はXcode上で行うのがコード補完も効くためおすすめです。
 
-### B: 通知が許可された場合にdevice tokenをリクエスト
+```sh
+$ swift package generate-xcodeproj
+```
 
-通知が許可されたら、次に[registerForRemoteNotifications()](https://developer.apple.com/documentation/uikit/uiapplication/1623078-registerforremotenotifications)というメソッドを呼び、device tokenの取得をリクエストします。これはアプリを起動するごとに毎回呼ぶ必要があります。
+### VaporAPNSを利用してプッシュ通知を発行
 
-一見、一回device token取得できれば、再度問い合わせる必要は無いのでは？と思ってしまいますが、公式ドキュメントにはdevice tokenは変更されるうるので起動する度に毎回問い合わせるように、と明記されています。
+`main.swift`で以下のようにVaporAPNSをimportして、プッシュ通知を送る処理を記述して、実行します。初回は[🔧 Installation · matthijs2704/vapor-apns Wiki](https://github.com/matthijs2704/vapor-apns/wiki/%F0%9F%94%A7-Installation)に記載の通り、HTTP/2対応のcurlをインストールする処理もセットで実行されます。
 
-> Never cache device tokens in your app; instead, get them from the system when you need them. APNs issues a new device token to your app when certain events happen. The device token is guaranteed to be different, for example, when a user restores a device from a backup, when the user installs your app on a new device, and when the user reinstalls the operating system. Fetching the token, rather than relying on a cache, ensures that you have the current device token needed for your provider to communicate with APNs. When you attempt to fetch a device token but it has not changed, the fetch method returns quickly.
-> [Local and Remote Notification Programming Guide: Configuring Remote Notification Support](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/HandlingRemoteNotifications.html#//apple_ref/doc/uid/TP40008194-CH6-SW1)
+<<[TODO: code](codes/chapter4/main.swift)
 
-ただ、[観測ベースではiOS 9以上ではアプリ再インストールの時にのみdevice tokenが変わるようになっています](http://qiita.com/mono0926/items/9ef83c8b0de0e84118ac)。とはいえ、他のレアケースで変わり得るかもしれず、また今後のiOSバージョンで挙動が変わる可能性もあるので、ドキュメントに記載の通り、毎回起動する度にdevice tokenを問い合わせるのがセオリーです。
+プログラムを実行(XcodeでRun、あるいは`.build/debug/ApnsPublisher`をコマンドで実行)すると、指定したdevice tokenの端末に通知が届くはずです。
 
-### C: メインスレッドに戻す
+詳細は、[Home · matthijs2704/vapor-apns Wiki](https://github.com/matthijs2704/vapor-apns/wiki)に記述されていますが、コード補完やVaporAPNSのソースを読むだけでも書き進められると思います。
 
-`requestAuthorization(options:completionHandler:)`のコールバックはバックグラウンドスレッドから返るので、メインスレッドから`registerForRemoteNotifications()`を呼びます。
-実は筆者は、Xcode 8では`DispatchQueue.main.async`で囲まずに直接`registerForRemoteNotifications()`を呼んでしまっていました(大半の方はそう書いていたのでは無いでしょうか？)。Xcode 9で[Main Thread Checker](https://developer.apple.com/documentation/code_diagnostics/main_thread_checker)という、`UIKit`などのメインスレッドから呼ばれる前提のAPIにバックグラウンドスレッドからアクセスがあった際に検知する仕組みが導入され、それに指摘されたのでメインスレッドに戻す処理を加えました。UI更新では無いのでメインスレッドに戻さずともあまり問題が無さそうに見え、かつ以前バックグランドから呼び出していた時も全く問題なく動いていたので必ずしも必要かは不明ですが、指摘通りにメインスレッドから呼び出すに越したことはないと思っています。
+基本的に、以下に記載の仕様と一対一対応したようなインターフェースとなっているため、プッシュ通知のすべての機能を制限なく利用できるライブラリとなっています。
 
-### `registerForRemoteNotifications()`の結果のハンドリング
+- [Local and Remote Notification Programming Guide: APNs Overview](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/APNSOverview.html#//apple_ref/doc/uid/TP40008194-CH8-SW1)
 
-`registerForRemoteNotifications()`でdevice tokenの取得リクエストが走り、その結果が`AppDelegate`クラスの次のいずれかのメソッドに返ります。前者は失敗時後者は成功時に呼ばれます。
+### Production環境(Ad Hoc・App Storeアプリ)でプッシュ通知を送る
 
+ここまでで、Debug実行のアプリにプッシュ通知が届くようにまではできました。では、Production環境(Ad Hoc・App Storeアプリ)に対してプッシュ通知を送ってみましょう。以前の証明書形式のやり方では、App IDにそれぞれの環境用の証明書を紐づけたりとハマりどころでしたが、HTTP/2形式では同一のキーを用いて送れるので対応がとても簡単です。
 
-<<[TODO: code2](codes/chapter4/AppDelegate2.swift)
+<<[TODO: code](codes/chapter4/main_sandbox.swift)
 
-#### 失敗時のハンドリング
+<<[TODO: code](codes/chapter4/main_loop.swift)
 
-まずは、失敗時の典型例を2つ紹介します。
+## 5.4 [Firebase Notifications](https://firebase.google.com/docs/cloud-messaging/)の利用
 
-1つ目は、シミュレーターで実行した時のエラーです。
+ライブラリ以外の選択肢としては、プッシュ通知サービスの活用があります。昨今ではライブラリを使って自前でプッシュ通知を発行するのではなく、プッシュ通知サービスの利用が主流ではないでしょうか。いくつかありますが、ここでは筆者が気に入っているFirebase Notificationsを紹介します。他にも良いサービスはありますが、HTTP/2方式に対応しているサービスをおすすめします(例えば現時点では[Amazon SNS](https://aws.amazon.com/sns/)は非対応なので筆者はおすすめしません)。
 
+TODO: 色々説明するのだるいので余裕あったら。面倒だったら定性的な説明に留めるかも。
 
-E> Domain=NSCocoaErrorDomain Code=3010 "remote notifications are not supported in the simulator" UserInfo={NSLocalizedDescription=remote notifications are not supported in the simulator}
-
-シミュレーターは通知に対応しておらず、常にこのエラーが返ってきてしまい、エラーログとして出すのは不適切だろうということで上記コードでは`TARGET_OS_SIMULATOR == 0`では無い時(シミュレーターの時)はINFOレベルのログを出すにとどめています。
-
-2つ目は、CapabilitiesでPush Notificationsをオンにしていない場合です。
-
-E> Domain=NSCocoaErrorDomain Code=3000 "no valid “aps-environment” entitlement string found for application" UserInfo={NSLocalizedDescription=no valid “aps-environment” entitlement string found for application}
-
-その他、設定ミスによっていくつかパターンがありますが、エラーログを落ち着いて確認したり調べたりして対処していきましょう。
-
-#### 成功時のハンドリング
-
-ここまで記載通りに処理を記述していて、実機実行した場合、後者のメソッドが呼ばれて、Deta型のdeviceTokenが取得できます。Data型のまま取り回す場合もありますが、16進数のString型に変換して取り扱うことも多いです。また、ログに表示するときもそちらが見やすいですね。
-
-残念ながら、16進数のString型に変換する標準メソッドは用意されていないですが、Swiftの場合、`deviceToken.map { String(format: "%.2hhx", $0) }.joined()`という比較的簡単な記述で変換できます。この変換方法は筆者が以前色々考えた末にベストだと思った書き方です(参考: [Swift 3.0でのプッシュ通知用のDevice TokenのData型から16進数文字列への変換方法 - Qiita](http://qiita.com/mono0926/items/3cf0dca3029f32f54a09))。
-
-`token: xxxxxxxxxxxxxxxx`のような文字列がコンソールされますが、次章ではそれを用いてプッシュ通知を発行してみます。
-
-// TODO: iOS 9非対応の言い訳
