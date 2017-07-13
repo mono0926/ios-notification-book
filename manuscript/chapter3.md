@@ -23,9 +23,9 @@ device tokenの取得には[Apple Developer Program](https://developer.apple.com
 4. +ボタンを押す
 5. 作りたい証明書の種類に合わせていずれかを選択
     - デバッグ実行用: Development - iOS App Development
-    - AdHoc配布・AppStore用: Production - App Store and Ad Hoc
+    - AdHoc配布・AppStore用: Production - App Store and Ad Hoc
 6. 手順2で保存した証明書を選択して次へ
-7. 生成された証明書をダウンロード・実行してKeychainにインストール
+7. 生成された証明書をダウンロード・実行してKeychainにインストール
   - 秘密鍵と公開鍵のペアを安全な場所にバックアップしておく
 
 ![](images/chapter3/cert1.png)
@@ -42,7 +42,7 @@ device tokenの取得には[Apple Developer Program](https://developer.apple.com
 
 ### プッシュ通知発行に必要なKeyファイルを生成・ダウンロード
 
-プッシュ通知発行は2015年12月に、HTTP/2形式の新しいやり方ができたため、そちらでのやり方を説明します。また、古い方式との差は本章末尾の「3.2 プッシュ通知送信の2つの方式」で説明します。
+プッシュ通知発行は2015年12月に、HTTP/2形式の新しいやり方ができたため、そちらでのやり方を説明します。また、古い方式との差は本章末尾の「3.2 プッシュ通知送信の2つの方式」で説明します。
 
 次の手順通りに操作して、プッシュ通知発行に必要なKeyファイルを生成・ダウンロードしておきます。
 
@@ -55,8 +55,8 @@ device tokenの取得には[Apple Developer Program](https://developer.apple.com
 5. Confirmを押す
 6. Key IDを確認
   - この後、いつでも確認可能
-7. Downloadボタンを押して`AuthKey_KEYID.p8`というKeyファイルをダウンロード
-  - 記載の説明の通り、ダウンロードは1回しかできないので、ダウンロードしたKeyファイルは速やかに安全な場所に保存
+7. Downloadボタンを押して`AuthKey_KEYID.p8`というKeyファイルをダウンロード
+  - 記載の説明の通り、ダウンロードは1回しかできないので、ダウンロードしたKeyファイルは速やかに安全な場所に保存
   - これを失くすと、プッシュ通知を送信できず再発行が必要になる
 
 ![](images/chapter3/certificate.png)
@@ -65,17 +65,17 @@ device tokenの取得には[Apple Developer Program](https://developer.apple.com
 
 ![](images/chapter3/new_key2.png)
 
-### App IDを生成
+### App IDを生成
 
-単に実機実行したいだけであれば、[Xcode 7以降は無料で行えるようになりました](http://qiita.com/FumihikoSHIROYAMA/items/a754f77c41b585c90329)。ただ、プッシュ通知を使う場合は、開発者登録して、明示的なApp ID(Wildcaseでは無いApp ID)を生成する必要があります。このApp IDでアプリが一意に区別されます。
+単に実機実行したいだけであれば、[Xcode 7以降は無料で行えるようになりました](http://qiita.com/FumihikoSHIROYAMA/items/a754f77c41b585c90329)。ただ、プッシュ通知を使う場合は、開発者登録して、明示的なApp ID(Wildcaseでは無いApp ID)を生成する必要があります。このApp IDでアプリが一意に区別されます。
 
-App IDの生成は以下の手順で行います。
+App IDの生成は以下の手順で行います。
 
 1. Identifiers - App IDsを選択
 2. +ボタンを押す
 3. App ID DescriptionのNameを記入
   - 区別できれば何でも良い
-4. Explicit App ID(明示的なApp ID)を記入
+4. Explicit App ID(明示的なApp ID)を記入
   - 世界で一意である必要がある
   - `YOUR_DOMAIN.アプリ名`が推奨
 5. Confirm → Registerと押して生成
@@ -84,11 +84,11 @@ device tokenの取得には[Apple Developer Program](https://developer.apple.com
 
 ![](images/chapter3/app_id2.png)
 
-### 端末のUDIDの登録
+### 端末のUDIDの登録
 
-明示的なApp ID指定をしたアプリを実機実行するには、端末のUDID登録が必要です。
+明示的なApp ID指定をしたアプリを実機実行するには、端末のUDID登録が必要です。
 
-まずは端末のUDIDを[iPhoneなどのUDIDを調べる方法 | MUSHIKAGO APPS MEMO](http://mushikago.com/i/?p=1833)などを参考に調べておきます。
+まずは端末のUDIDを[iPhoneなどのUDIDを調べる方法 | MUSHIKAGO APPS MEMO](http://mushikago.com/i/?p=1833)などを参考に調べておきます。
 
 次に、以下の手順で登録します。
 
@@ -96,13 +96,13 @@ device tokenの取得には[Apple Developer Program](https://developer.apple.com
 2. +ボタンを押す
 3. 端末のNameを入力
   - 区別できれば何でも良い
-4. 調べておいたUDIDを入力
+4. 調べておいたUDIDを入力
 
 ![](images/chapter3/device1.png)
 
 ![](images/chapter3/device2.png)
 
-詳しくは割愛しますが、端末登録は[fastlane/register_devices](https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/register_devices.rb)という[fastlane](https://fastlane.tools)のアクションを用いることで、コマンドで済ませることもできます。
+詳しくは割愛しますが、端末登録は[fastlane/register_devices](https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/register_devices.rb)という[fastlane](https://fastlane.tools)のアクションを用いることで、コマンドで済ませることもできます。
 
 
 #### アクションの実行例
@@ -119,21 +119,21 @@ xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx	Masayuki Ono - iPhone 7 Plus
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx	Masayuki Ono - iPhone 7 Plus2
 ```
 
-### Provisioning Profileの作成
+### Provisioning Profileの作成
 
-最後に、次の手順で、上で作成した証明書・App ID・端末を紐付けるProvisioning Profileを作成します。
+最後に、次の手順で、上で作成した証明書・App ID・端末を紐付けるProvisioning Profileを作成します。
 
 1. Provisioning Profiles - Allを選択
 2. +ボタンを押す
 3. 作りたいProvisioning Profileの種類を選択(基本的には、まずはデバッグ実行用)
     - デバッグ実行用: Development - iOS App Development
-    - AdHoc配布用: Distribution - Ad Hoc
-    - AppStore用: Distribution - App Store 
+    - AdHoc配布用: Distribution - Ad Hoc
+    - AppStore用: Distribution - App Store 
 4. 紐付けるApp IDで先ほど作ったApp IDを選択
 5. 紐付ける証明書を選択
 6. 紐付ける端末を選択
     - App Storeの時はこの項目は無し
-7. Provisioning Profile名を入力
+7. Provisioning Profile名を入力
   - 区別できれば何でも良い
 
 
@@ -151,7 +151,7 @@ xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx	Masayuki Ono - iPhone 7 Plus2
 
 作成したProvisioning Profileはダウンロードして開くとKeychainに読み込まれます。
 
-また、XcodeのPreferenceのAccountsタブの`Download All Profiles`ボタンで一気に作成済みのProvisioning Profileのダウンロード・更新ができて便利なので、筆者は主にそちらを用いてローカルのProvisioning Profileの更新を行なっています。
+また、XcodeのPreferenceのAccountsタブの`Download All Profiles`ボタンで一気に作成済みのProvisioning Profileのダウンロード・更新ができて便利なので、筆者は主にそちらを用いてローカルのProvisioning Profileの更新を行なっています。
 
 ![](images/chapter3/profile.png)
 
@@ -164,14 +164,14 @@ xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx	Masayuki Ono - iPhone 7 Plus2
 現状、プッシュ通知送信の方式は2つあり、本書では後発で洗練されて使いやすいHTTP/2方式でのやり方で説明していきます。
 
 - [HTTP/2方式](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/APNSOverview.html#//apple_ref/doc/uid/TP40008194-CH8-SW1)
-  - 2015年12月から使えるようになった新しい方式
+  - 2015年12月から使えるようになった新しい方式
 - Binary Provider API
-  - [レガシーな方式](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/BinaryProviderAPI.html#//apple_ref/doc/uid/TP40008194-CH13-SW1)
+  - [レガシーな方式](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/BinaryProviderAPI.html#//apple_ref/doc/uid/TP40008194-CH13-SW1)
 
 
 以前のBinary Provide APIでは、APNsサーバにリクエストした通知が成功したかどうかを知るには、通知発行元のサーバが別のAPNsフィードバックサーバにいちいち問い合わせ（ポーリング）しなくてはいけない作りになっていました。また、APNsサーバへのリクエストも[バイナリAPIというWeb標準ではない独特のもの](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/LegacyNotificationFormat.html#//apple_ref/doc/uid/TP40008194-CH14-SW1)でした。
 
-そして、2015年12月にHTTP/2の方式が使えるようになり、それは直接結果を受け取れる自然な構成となっています。また、1接続で並行して通知リクエストを行え、効率良く処理が可能となります。
+そして、2015年12月にHTTP/2の方式が使えるようになり、それは直接結果を受け取れる自然な構成となっています。また、1接続で並行して通知リクエストを行え、効率良く処理が可能となります。
 
 通知発行結果は、[レスポンスに含まれる9種類のステータスコード・Reason](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingwithAPNs.html#//apple_ref/doc/uid/TP40008194-CH11-SW1)で、次のような項目を判別でき、それによって適切なハンドリングが可能です。
 
